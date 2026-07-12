@@ -48,7 +48,7 @@
         10
     );
        
-    // imu
+    // imu (inertial)
     pros::Imu imu(7);
 
     // vertical tracking wheel encoder
