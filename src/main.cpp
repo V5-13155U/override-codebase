@@ -22,7 +22,7 @@
         -1
     );
 
-    // lateral PID controller
+    // lateral PID controlle
     lemlib::ControllerSettings lateral_controller
         (10, // proportional gain (kP)
         0, // integral gain (kI)
