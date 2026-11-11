@@ -73,8 +73,7 @@
         });
 
         chassis.setPose(0, 0, 0);
-        chassis.moveToPoint(0, 24, 15000, {.maxSpeed = 50});
-        chassis.turnToHeading(270, 8000, {.maxSpeed = 50});
+        chassis.moveToPoint(0, 24, 2000);
     }
     
     /** 
