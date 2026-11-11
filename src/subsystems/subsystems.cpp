@@ -30,9 +30,9 @@ lemlib::ControllerSettings lateral_controller(
 
 // angular PID controller
 lemlib::ControllerSettings angular_controller(
-    0.90, // kP
+    8, // kP
     0,    // kI
-    5,    // kD
+    40,    // kD
     0,    // anti windup
     2,    // small error range (degrees)
     100,  // small error range timeout (ms)

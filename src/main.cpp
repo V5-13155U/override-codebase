@@ -21,7 +21,30 @@
     vertical_encoder.reset();
     vertical_encoder.set_reversed(true);
 
-    // bansheelift setup + intitialization
+    pros::Task telemetry_task([]() {
+    while (true) {
+    // 1. Grab LemLib Odometry Pose Variables
+        lemlib::Pose pose = chassis.getPose();
+        double x = pose.x;
+        double y = pose.y;
+        double theta = pose.theta;
+
+        // 2. Grab Raw Sensor Variables
+        double imu_heading = imu.get_heading();
+        int vert_rot = vertical_encoder.get_position(); // Returns centidegrees (100 = 1 degree)
+        int horiz_rot = horizontal_encoder.get_position();
+
+        // 3. Print to fixed LCD lines (overwrites existing text cleanly without leaking memory)
+        pros::lcd::print(1, "X: %.2f | Y: %.2f", x, y);
+        pros::lcd::print(2, "Theta: %.2f | IMU: %.2f", theta, imu_heading);
+        pros::lcd::print(3, "Vert: %d | Horiz: %d", vert_rot, horiz_rot);
+
+        // 4. Safe 250ms delay (4 updates per second) prevents CPU/memory overload
+        pros::delay(250);
+        }
+    });
+
+    /* bansheelift setup + intitialization
     bansheelift.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
     bansheelift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     bansheelift.move_velocity(60);
@@ -51,7 +74,7 @@
     while (std::fabs(bansheelift.get_position() - custom_start_angle) > 3 &&
            pros::millis() - settle_start < 1000) {
         pros::delay(10);
-    }
+    }*/
 
     chassis.calibrate();
     cascade.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
