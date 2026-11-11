@@ -1,12 +1,5 @@
-    #include "main.h"
-    #include "lemlib/api.hpp"
-    #include "lemlib/chassis/chassis.hpp"
-    #include "lemlib/chassis/trackingWheel.hpp"
-    #include "liblvgl/llemu.hpp"
-    #include "pros/imu.hpp"
-    #include "pros/motors.hpp"
-    #include "pros/rtos.hpp"    
-    #include <cmath>
+#include "main.h"
+#include <cmath>
 
 
     /**
