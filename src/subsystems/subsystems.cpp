@@ -1,4 +1,3 @@
-
 #include "main.h"
 #include "lemlib/api.hpp"
 
@@ -18,15 +17,15 @@ lemlib::Drivetrain drivetrain(
 
 // lateral PID controller
 lemlib::ControllerSettings lateral_controller(
-    10,
-    0,
-    12,
-    3,
-    1,
-    100,
-    3,
-    200,
-    20
+    10,   // kP
+    0,    // kI
+    3,    // kD - CHANGED from 12 to 3 to reduce shaking at the end of moves
+    3,    // anti windup
+    1,    // small error range (inches)
+    100,  // small error range timeout (ms)
+    3,    // large error range (inches)
+    200,  // large error range timeout (ms)
+    20    // maximum acceleration (slew)
 );
 
 // angular PID controller
