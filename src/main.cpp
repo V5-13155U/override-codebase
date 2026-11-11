@@ -35,6 +35,7 @@
         vertical_encoder.set_reversed(true);
         chassis.calibrate();
 
+        cascade.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
     }
 
