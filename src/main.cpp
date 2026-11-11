@@ -1,4 +1,4 @@
-#include "main.h" //s
+#include "main.h"
 #include <cmath>
 
     void on_center_button() {
