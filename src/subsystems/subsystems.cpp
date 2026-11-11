@@ -17,9 +17,9 @@ lemlib::Drivetrain drivetrain(
 
 // lateral PID controller
 lemlib::ControllerSettings lateral_controller(
-    10,   // kP
+    6.5,   // kP
     0,    // kI
-    3,    // kD 
+    0,    // kD 
     3,    // anti windup
     1,    // small error range (inches)
     100,  // small error range timeout (ms)
