@@ -19,13 +19,13 @@ lemlib::Drivetrain drivetrain(
 lemlib::ControllerSettings lateral_controller(
     10,   // kP
     0,    // kI
-    3,    // kD - CHANGED from 12 to 3 to reduce shaking at the end of moves
-    3,    // anti windup
-    1,    // small error range (inches)
-    100,  // small error range timeout (ms)
-    3,    // large error range (inches)
-    200,  // large error range timeout (ms)
-    20    // maximum acceleration (slew)
+    3,    // kD 
+    0,    // anti windup
+    0,    // small error range (inches)
+    0,  // small error range timeout (ms)
+    0,    // large error range (inches)
+    0,  // large error range timeout (ms)
+    0    // maximum acceleration (slew)
 );
 
 // angular PID controller
@@ -41,7 +41,7 @@ lemlib::ControllerSettings angular_controller(
     10
 );
 
-// IMU - CORRECTED TO PORT 13
+// imu setup
 pros::Imu imu(13);
 
 // tracking wheel encoder setup
