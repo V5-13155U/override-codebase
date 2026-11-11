@@ -14,3 +14,36 @@
         360,
         2
     );
+
+    // lateral PID controller
+    lemlib::ControllerSettings lateral_controller
+        (10, // proportional gain (kP)
+        0, // integral gain (kI)
+        12, // derivative gain (kD)
+        3, // anti windup
+        1, // small error range, in inches
+        100, // small error range timeout, in milliseconds
+        3, // large error range, in inches
+        200, // large error range timeout, in milliseconds
+        20 // maximum acceleration (slew)
+        );
+
+    // angular PID controller   
+    lemlib::ControllerSettings angular_controller(
+        0.90,   // kP slightly lower than original 8
+        0,
+        0.5,  // kD slightly higher than original 40
+        0,
+        2,          
+        100,
+        5,
+        300,
+        10
+    );
+
+    // imu (inertial)
+    pros::Imu imu(12);
+
+    // tracking wheel encoder setup
+    pros::Rotation vertical_encoder(16);
+    pros::Rotation horizontal_encoder(4);
