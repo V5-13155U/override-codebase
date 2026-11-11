@@ -36,5 +36,14 @@ void opcontrol() {
         } else {
             intake.move(0);
         }
+
+        // cascade control
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+            cascade.move(127);
+        } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+            cascade.move(-127);
+        } else {
+            cascade.move(0);
+        }
     }
 }
