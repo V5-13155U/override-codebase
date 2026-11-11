@@ -21,10 +21,30 @@
     vertical_encoder.reset();
     vertical_encoder.set_reversed(true);
 
+    // bansheelift setup + intitialization
+    bansheelift.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
+    bansheelift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    bansheelift.move_velocity(60);
+    int stall_timer = 0;
+
+    while (std::abs(bansheelift.get_actual_velocity()) > 5 || stall_timer < 20) {
+        pros::delay(10);
+        if (std::abs(bansheelift.get_actual_velocity()) <= 5) {
+            stall_timer++;
+        } else {
+            stall_timer = 0;
+        }
+    }
+
+    bansheelift.move_velocity(0);
+    bansheelift.tare_position(); 
+
+    // 3. Move down to your default starting position (Change -30 to whatever you want)
+    const int custom_start_angle = -30; 
+    bansheelift.move_absolute(custom_start_angle, 100);
+
     chassis.calibrate();
-
-        cascade.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
+    cascade.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     }
 
     void disabled() {}
