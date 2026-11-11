@@ -45,8 +45,8 @@ lemlib::ControllerSettings angular_controller(
 pros::Imu imu(13);
 
 // tracking wheel encoder setup
-pros::Rotation vertical_encoder(17);
-pros::Rotation horizontal_encoder(4);
+pros::Rotation vertical_encoder(4);
+pros::Rotation horizontal_encoder(17);
 
 lemlib::TrackingWheel vertical_tracking_wheel(
     &vertical_encoder,

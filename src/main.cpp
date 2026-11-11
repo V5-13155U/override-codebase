@@ -21,6 +21,7 @@
     vertical_encoder.reset();
     vertical_encoder.set_reversed(true);
 
+    pros::lcd::clear_line(0);
     pros::Task telemetry_task([]() {
     while (true) {
     // 1. Grab LemLib Odometry Pose Variables
