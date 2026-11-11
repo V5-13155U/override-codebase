@@ -47,3 +47,32 @@
     // tracking wheel encoder setup
     pros::Rotation vertical_encoder(16);
     pros::Rotation horizontal_encoder(4);
+
+    lemlib::TrackingWheel vertical_tracking_wheel(
+        &vertical_encoder,
+        2.125,
+        0.55
+    );
+
+    lemlib::TrackingWheel horizontal_tracking_wheel(
+        &horizontal_encoder,
+        2.125,
+        0.55
+    );
+
+    // odometry settings
+    lemlib::OdomSensors sensors(
+        &vertical_tracking_wheel,
+        nullptr,
+        &horizontal_tracking_wheel,
+        nullptr,
+        &imu
+    );
+
+    // chassis
+    lemlib::Chassis chassis(
+        drivetrain,
+        lateral_controller,
+        angular_controller,
+        sensors
+    );
