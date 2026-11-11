@@ -69,116 +69,56 @@
     * starts.
     */
 
-// ===========================================================================
-// AUTONOMOUS HELPERS
-// ===========================================================================
+    void run_sensor_diagnostic() {
+    while (true) {
+        // keep the drivetrain stopped the whole time
+        left_motors.move(0);
+        right_motors.move(0);
  
-// Shows which auton step is running on the Brain screen, so if the robot
-// does something wrong you can see exactly which step it was on.
-void show_step(const char* text) {
-    pros::lcd::print(3, "AUTON: %s", text);
-}
+        // ---- IMU (port 13) ----
+        double heading = imu.get_heading();
+        double rotation = imu.get_rotation();
  
-// ---------------------------------------------------------------------------
-// MECHANISM SETTINGS - all TUNE values. If a motor spins the wrong way,
-// flip the sign of its speed here instead of changing anything else.
-// ---------------------------------------------------------------------------
-const int INTAKE_IN_SPEED  = 127;   // TUNE: flip to -127 if the intake spits out
-const int INTAKE_OUT_SPEED = -127;  // TUNE: flip to 127 if it pulls in
+        // ---- Rotation sensors (raw position is in centidegrees) ----
+        int32_t vert_raw = vertical_encoder.get_position();
+        int32_t horiz_raw = horizontal_encoder.get_position();
  
-const int LIFT_SPEED       = 100;   // TUNE: lift speed (max 200 on green)
-const double LIFT_UP_DEG   = -5;   // TUNE: how far up the lift goes (degrees)
-const double LIFT_DOWN_DEG = -300;     // TUNE: lift down position (0 = start spot)
-                                    // if the lift goes DOWN first, make
-                                    // LIFT_UP_DEG negative
+        // ---- LemLib pose ----
+        lemlib::Pose pose = chassis.getPose();
  
-// Moves the banshee lift to a position and waits until it gets there
-// (or gives up after timeout_ms so auton never gets stuck).
-void lift_to(double target_deg, int timeout_ms) {
-    bansheelift.move_absolute(target_deg, LIFT_SPEED);
-    int start = pros::millis();
-    while (std::fabs(bansheelift.get_position() - target_deg) > 5 &&
-           pros::millis() - start < timeout_ms) {
-        pros::delay(10);
+        pros::lcd::print(0, "SENSOR DIAGNOSTIC - motors stopped");
+ 
+        if (std::isinf(heading) || std::isnan(heading)) {
+            pros::lcd::print(1, "IMU p13: ERROR (inf) - check port/cable");
+        } else {
+            pros::lcd::print(1, "IMU p13 heading: %.2f", heading);
+        }
+        pros::lcd::print(2, "IMU rotation: %.2f  calibrating: %s",
+                         rotation, imu.is_calibrating() ? "YES" : "no");
+ 
+        if (vert_raw == PROS_ERR) {
+            pros::lcd::print(3, "Vert p16: ERROR %d", static_cast<int>(vert_raw));
+        } else {
+            pros::lcd::print(3, "Vert p16: %.2f deg", vert_raw / 100.0);
+        }
+ 
+        if (horiz_raw == PROS_ERR) {
+            pros::lcd::print(4, "Horiz p4: ERROR %d", static_cast<int>(horiz_raw));
+        } else {
+            pros::lcd::print(4, "Horiz p4: %.2f deg", horiz_raw / 100.0);
+        }
+ 
+        pros::lcd::print(5, "Pose X: %.2f  Y: %.2f", pose.x, pose.y);
+        pros::lcd::print(6, "Pose Theta: %.2f", pose.theta);
+        pros::lcd::print(7, "Spin tracking wheels by hand to test");
+ 
+        pros::delay(50);
     }
 }
- 
-// ---------------------------------------------------------------------------
-// MECHANISM ACTIONS
-// ---------------------------------------------------------------------------
-void score_preload() {
-    show_step("score preload");
-    intake.move(INTAKE_OUT_SPEED);   // push the preload cone out
-    pros::delay(600);                // TUNE: how long to spit it out
-    intake.move(0);
-}
- 
-// Banshee claw: lift goes up, then comes back down to catch the pin
-void grab_goal() {
-    show_step("grab goal - lift up");
-    lift_to(LIFT_UP_DEG, 1500);
-    show_step("grab goal - lift down");
-    lift_to(LIFT_DOWN_DEG, 1500);
-}
- 
-void pick_up_cone() {
-    show_step("pick up cone");
-    intake.move(INTAKE_IN_SPEED);    // keep pulling the cone in
-    pros::delay(800);                // TUNE: how long to intake
-    intake.move(0);
-}
- 
-void stack_cone() {
-    show_step("stack cone (placeholder)");
-    pros::delay(500);
-}
- 
-// ===========================================================================
-// AUTONOMOUS ROUTINE
-// Coordinates are in inches. The robot starts at (0, 0) facing forward (0 deg).
-// +Y = straight ahead from the start, +X = to the robot's right.
-// Every number marked TUNE is an estimate from the video. Measure on the
-// field and adjust.
-// ===========================================================================
-void autonomous() {
-    chassis.setPose(0, 0, 0);
- 
-    // STEP 1: drive forward to the red base and score the preload cone
-    show_step("1 drive to red base");
-    chassis.moveToPoint(0, 18, 2000);           // TUNE: distance to red base
-    chassis.waitUntilDone();
-    score_preload();
- 
-    // STEP 2: back up away from the red base
-    show_step("2 back up");
-    chassis.moveToPoint(0, 6, 1500, {.forwards = false});  // TUNE
-    chassis.waitUntilDone();
- 
-    // STEP 3: turn so the BACK of the robot (banshee claw) faces the goal
-    // 225 = 45 + 180, so the back points toward the goal at 45 degrees
-    show_step("3 turn back to goal");
-    chassis.turnToHeading(225, 1500);           // TUNE: angle (keep +180)
-    chassis.waitUntilDone();
- 
-    // STEP 4: drive BACKWARDS into the goal and grab it with the banshee
-    show_step("4 back into goal");
-    chassis.moveToPoint(24, 30, 3000, {.forwards = false});  // TUNE: goal position
-    chassis.waitUntilDone();
-    grab_goal();
- 
-    // STEP 5: pick up the yellow cone next to the goal
-    show_step("5 pick up cone");
-    pick_up_cone();
- 
-    // STEP 6: drive FORWARD back toward the starting corner, pulling the goal
-    // behind the robot on the banshee
-    show_step("6 return to corner");
-    chassis.moveToPoint(6, 8, 3000);            // TUNE
-    chassis.waitUntilDone();
- 
-    // STEP 7: stack the cone on the goal
-    show_step("7 stack cone");
-    stack_cone();
- 
-    show_step("DONE");
-}
+
+    void autonomous() {
+        chassis.setPose(0, 0, 0);
+        run_sensor_diagnostic();  // TEST: shows sensors instead of driving
+    }
+
+    // Note: opcontrol() is defined in src/robotcontrol/opcontrol.cpp

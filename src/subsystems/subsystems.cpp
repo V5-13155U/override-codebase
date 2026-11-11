@@ -20,32 +20,32 @@ lemlib::ControllerSettings lateral_controller(
     10,   // kP
     0,    // kI
     3,    // kD 
-    0,    // anti windup
-    0,    // small error range (inches)
-    0,  // small error range timeout (ms)
-    0,    // large error range (inches)
-    0,  // large error range timeout (ms)
-    0    // maximum acceleration (slew)
+    3,    // anti windup
+    1,    // small error range (inches)
+    100,  // small error range timeout (ms)
+    3,    // large error range (inches)
+    500,  // large error range timeout (ms)
+    20    // maximum acceleration (slew)
 );
 
 // angular PID controller
 lemlib::ControllerSettings angular_controller(
-    0.90,
-    0,
-    0,
-    0,
-    2,
-    100,
-    5,
-    300,
-    10
+    0.90, // kP
+    0,    // kI
+    5,    // kD
+    0,    // anti windup
+    2,    // small error range (degrees)
+    100,  // small error range timeout (ms)
+    5,    // large error range (degrees)
+    300,  // large error range timeout (ms)
+    10    // maximum acceleration (slew)
 );
 
 // imu setup
 pros::Imu imu(13);
 
 // tracking wheel encoder setup
-pros::Rotation vertical_encoder(16);
+pros::Rotation vertical_encoder(17);
 pros::Rotation horizontal_encoder(4);
 
 lemlib::TrackingWheel vertical_tracking_wheel(
@@ -64,7 +64,7 @@ lemlib::TrackingWheel horizontal_tracking_wheel(
 lemlib::OdomSensors sensors(
     &vertical_tracking_wheel,
     nullptr,
-    &horizontal_tracking_wheel,
+    &horizontal_tracking_wheel,   // turned back on for testing
     nullptr,
     &imu
 );
