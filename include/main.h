@@ -75,6 +75,24 @@ void opcontrol(void);
  * You can add C++-only headers here
  */
 //#include <iostream>
+#include "lemlib/chassis/chassis.hpp"
+
+// Drivetrain & Chassis
+extern pros::MotorGroup left_motors;
+extern pros::MotorGroup right_motors;
+extern lemlib::Chassis chassis;
+
+// Sensors & Encoders
+extern pros::Rotation vertical_encoder;
+extern pros::Rotation horizontal_encoder;
+extern pros::Imu imu;
+
+// Subsystems (Intake, Banshee, Cascade)
+extern pros::Motor intake;
+extern pros::Motor bansheespin;
+extern pros::Motor bansheelift;
+extern pros::MotorGroup cascade;
+
 #endif
 
 #endif  // _PROS_MAIN_H_
