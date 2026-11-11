@@ -56,24 +56,11 @@
     * starts.
     */
 
-    void competition_initialize() {}
-
     void autonomous() {
         chassis.setPose(0, 0, 0);
-        pros::delay(1000);
 
-        pros::Task* screen_task = new pros::Task([]() {
-            while (true) {
-                pros::lcd::print(0, "ROT %ld", vertical_encoder.get_position());
-                pros::lcd::print(1, "X %.2f", chassis.getPose().x);
-                pros::lcd::print(2, "Y %.2f", chassis.getPose().y);
-                pros::lcd::print(3, "Theta %.2f", chassis.getPose().theta);
-                pros::delay(500);
-            }
-        });
-
-        chassis.setPose(0, 0, 0);
-        chassis.moveToPoint(0, 24, 2000);
+        chassis.moveToPoint(0, 24, 4000);
+        chassis.waitUntilDone();
     }
     
     /** 

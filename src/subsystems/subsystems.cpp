@@ -2,13 +2,13 @@
     #include "lemlib/api.hpp"
 
     // drivetrain configuration 
-    pros::MotorGroup left_motors({6, 7}, pros::MotorGearset::blue);
-    pros::MotorGroup right_motors({5, 20}, pros::MotorGearset::blue);
+    pros::MotorGroup left_motors({5, 20}, pros::MotorGearset::blue);
+    pros::MotorGroup right_motors({-6, -7}, pros::MotorGearset::blue);
 
     // drivetrain settings
         lemlib::Drivetrain drivetrain(
-		& left_motors,
-        & right_motors,
+		&left_motors,
+        &right_motors,
         11,
         lemlib::Omniwheel::NEW_325,
         360,
@@ -30,17 +30,16 @@
 
     // angular PID controller   
     lemlib::ControllerSettings angular_controller(
-        0.90,   // kP slightly lower than original 8
+        0.90,
         0,
-        0.5,  // kD slightly higher than original 40
         0,
-        2,          
+        0,
+        2,
         100,
         5,
         300,
         10
     );
-
     // imu (inertial)
     pros::Imu imu(12);
 
