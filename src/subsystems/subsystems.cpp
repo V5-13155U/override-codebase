@@ -41,7 +41,7 @@ lemlib::ControllerSettings angular_controller(
     10
 );
 
-// IMU - CORRECTED TO PORT 13
+// imu setup
 pros::Imu imu(13);
 
 // tracking wheel encoder setup
