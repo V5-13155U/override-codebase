@@ -2,8 +2,8 @@
 #include "lemlib/api.hpp"
 
 // drivetrain configuration
-pros::MotorGroup left_motors({5, 20}, pros::MotorGearset::blue);
-pros::MotorGroup right_motors({-6, -7}, pros::MotorGearset::blue);
+pros::MotorGroup left_motors({-6, -7}, pros::MotorGearset::blue);
+pros::MotorGroup right_motors({5, 20}, pros::MotorGearset::blue);
 
 // drivetrain settings
 lemlib::Drivetrain drivetrain(

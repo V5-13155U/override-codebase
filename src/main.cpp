@@ -72,7 +72,7 @@
 
     void autonomous() {
         chassis.setPose(0, 0, 0);
-        //run_sensor_diagnostic();  // TEST: shows sensors instead of driving
+        chassis.moveToPoint(0, 24, 4000);
     }
 
     // Note: opcontrol() is defined in src/robotcontrol/opcontrol.cpp
