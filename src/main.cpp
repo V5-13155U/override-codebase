@@ -1,11 +1,7 @@
-
 #include "main.h"
 #include <cmath>
 
-/**
- * LCD center button callback.
- */
-void on_center_button() {
+    void on_center_button() {
     static bool pressed = false;
     pressed = !pressed;
 
@@ -16,10 +12,7 @@ void on_center_button() {
     }
 }
 
-/**
- * Initialization.
- */
-void initialize() {
+    void initialize() {
     pros::lcd::initialize();
     pros::lcd::register_btn1_cb(on_center_button);
 
@@ -34,10 +27,7 @@ void initialize() {
 
     }
 
-/**
- * Disabled.
- */
-void disabled() {}
+    void disabled() {}
 
     /**
     * Runs after initialize(), and before autonomous when connected to the Field
