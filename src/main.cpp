@@ -30,74 +30,30 @@ void initialize() {
 
     chassis.calibrate();
 
-    pros::lcd::print(0, "Calibration complete");
-}
+        cascade.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+    }
 
 /**
  * Disabled.
  */
 void disabled() {}
 
-/**
- * Autonomous - Sensor diagnostic.
- */
-void autonomous() {
-    left_motors.move(0);
-    right_motors.move(0);
+    /**
+    * Runs after initialize(), and before autonomous when connected to the Field
+    * Management System or the VEX Competition Switch. This is intended for
+    * competition-specific initialization routines, such as an autonomous selector
+    * on the LCD.
+    *
+    * This task will exit when the robot is enabled and autonomous or opcontrol
+    * starts.
+    */
 
-    while (true) {
-        double heading = imu.get_heading();
+    void autonomous() {
+        chassis.setPose(0, 0, 0);
 
-        pros::lcd::print(0, "SENSOR DIAGNOSTICS");
-
-        pros::lcd::print(1, "IMU: %.2f", heading);
-
-        pros::lcd::print(
-            2, "Vertical: %d",
-            (int)vertical_encoder.get_position()
-        );
-
-        pros::lcd::print(
-            3, "Horizontal: %d",
-            (int)horizontal_encoder.get_position()
-        );
-
-        pros::delay(100);
+        chassis.moveToPoint(0, 24, 4000);
+        chassis.waitUntilDone();
     }
-}
 
-/**
- * Driver control.
- */
-void opcontrol() {
-    pros::Controller controller(pros::E_CONTROLLER_MASTER);
-
-    auto curve = [](int input) -> int {
-        const int deadband = 5;
-        const double expo = 0.45;
-
-        if (std::abs(input) < deadband)
-            return 0;
-
-        double x = input / 127.0;
-
-        x = expo * x * x * x + (1.0 - expo) * x;
-
-        return static_cast<int>(x * 127.0);
-    };
-
-    while (true) {
-        int leftPower = curve(
-            controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y)
-        );
-
-        int rightPower = curve(
-            controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y)
-        );
-
-        left_motors.move(leftPower);
-        right_motors.move(rightPower);
-
-        pros::delay(10);
-    }
-}
+    // Note: opcontrol() is defined in src/robotcontrol/opcontrol.cpp
