@@ -38,6 +38,7 @@
     * This task will exit when the robot is enabled and autonomous or opcontrol
     * starts.
     */
+
     void run_sensor_diagnostic() {
     while (true) {
         // keep the drivetrain stopped the whole time
@@ -84,6 +85,7 @@
         pros::delay(50);
     }
 }
+
     void autonomous() {
         chassis.setPose(0, 0, 0);
 
