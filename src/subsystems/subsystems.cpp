@@ -1,11 +1,11 @@
     #include "main.h"
     #include "lemlib/api.hpp"
 
-    // Drivetrain Configuration 
+    // drivetrain configuration 
     pros::MotorGroup left_motors({6, 7}, pros::MotorGearset::blue);
     pros::MotorGroup right_motors({5, 20}, pros::MotorGearset::blue);
 
-    // Drivetrain Settings
+    // drivetrain settings
         lemlib::Drivetrain drivetrain(
 		& left_motors,
         & right_motors,
@@ -76,3 +76,13 @@
         angular_controller,
         sensors
     );
+
+    // intake
+    pros::Motor intake(2, pros::MotorGearset::green);
+
+    // banshee subsystem
+    pros::Motor bansheespin (9, pros::MotorGearset::green);
+    pros::Motor bansheelift (1, pros::MotorGearset::green);
+
+    // cascade
+    pros::MotorGroup cascade({-18, 10}, pros::MotorGearset::green);
