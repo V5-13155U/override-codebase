@@ -12,5 +12,5 @@
         11,
         lemlib::Omniwheel::NEW_325,
         360,
-        -1
+        2
     );
