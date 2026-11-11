@@ -1,7 +1,7 @@
 #include "main.h"
 #include <cmath>
 
-void run_custom_opcontrol() {
+void opcontrol() {
     pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
     auto curve = [](int input) -> int {
