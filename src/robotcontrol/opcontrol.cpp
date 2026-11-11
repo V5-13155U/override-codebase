@@ -18,6 +18,8 @@ void opcontrol() {
     };
 
     while (true) {
+
+        // drivetrain control
         int leftPower = curve(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y));
         int rightPower = curve(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 
@@ -25,5 +27,14 @@ void opcontrol() {
         right_motors.move(rightPower);
 
         pros::delay(10);
+
+        // intake control
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+            intake.move(127);
+        } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+            intake.move(-127);
+        } else {
+            intake.move(0);
+        }
     }
 }
