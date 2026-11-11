@@ -1,87 +1,89 @@
-    #include "main.h"
-    #include "lemlib/api.hpp"
 
-    // drivetrain configuration 
-    pros::MotorGroup left_motors({5, 20}, pros::MotorGearset::blue);
-    pros::MotorGroup right_motors({-6, -7}, pros::MotorGearset::blue);
+#include "main.h"
+#include "lemlib/api.hpp"
 
-    // drivetrain settings
-        lemlib::Drivetrain drivetrain(
-		&left_motors,
-        &right_motors,
-        11,
-        lemlib::Omniwheel::NEW_325,
-        360,
-        2
-    );
+// drivetrain configuration
+pros::MotorGroup left_motors({5, 20}, pros::MotorGearset::blue);
+pros::MotorGroup right_motors({-6, -7}, pros::MotorGearset::blue);
 
-    // lateral PID controller
-    lemlib::ControllerSettings lateral_controller
-        (10, // proportional gain (kP)
-        0, // integral gain (kI)
-        12, // derivative gain (kD)
-        3, // anti windup
-        1, // small error range, in inches
-        100, // small error range timeout, in milliseconds
-        3, // large error range, in inches
-        200, // large error range timeout, in milliseconds
-        20 // maximum acceleration (slew)
-        );
+// drivetrain settings
+lemlib::Drivetrain drivetrain(
+    &left_motors,
+    &right_motors,
+    11,
+    lemlib::Omniwheel::NEW_325,
+    360,
+    2
+);
 
-    // angular PID controller   
-    lemlib::ControllerSettings angular_controller(
-        0.90,
-        0,
-        0,
-        0,
-        2,
-        100,
-        5,
-        300,
-        10
-    );
-    // imu (inertial)
-    pros::Imu imu(12);
+// lateral PID controller
+lemlib::ControllerSettings lateral_controller(
+    10,
+    0,
+    12,
+    3,
+    1,
+    100,
+    3,
+    200,
+    20
+);
 
-    // tracking wheel encoder setup
-    pros::Rotation vertical_encoder(16);
-    pros::Rotation horizontal_encoder(4);
+// angular PID controller
+lemlib::ControllerSettings angular_controller(
+    0.90,
+    0,
+    0,
+    0,
+    2,
+    100,
+    5,
+    300,
+    10
+);
 
-    lemlib::TrackingWheel vertical_tracking_wheel(
-        &vertical_encoder,
-        2.125,
-        0.55
-    );
+// IMU - CORRECTED TO PORT 13
+pros::Imu imu(13);
 
-    lemlib::TrackingWheel horizontal_tracking_wheel(
-        &horizontal_encoder,
-        2.125,
-        0.55
-    );
+// tracking wheel encoder setup
+pros::Rotation vertical_encoder(16);
+pros::Rotation horizontal_encoder(4);
 
-    // odometry settings
-    lemlib::OdomSensors sensors(
-        &vertical_tracking_wheel,
-        nullptr,
-        &horizontal_tracking_wheel,
-        nullptr,
-        &imu
-    );
+lemlib::TrackingWheel vertical_tracking_wheel(
+    &vertical_encoder,
+    2.125,
+    0.55
+);
 
-    // chassis
-    lemlib::Chassis chassis(
-        drivetrain,
-        lateral_controller,
-        angular_controller,
-        sensors
-    );
+lemlib::TrackingWheel horizontal_tracking_wheel(
+    &horizontal_encoder,
+    2.125,
+    0.55
+);
 
-    // intake
-    pros::Motor intake(2, pros::MotorGearset::green);
+// odometry settings
+lemlib::OdomSensors sensors(
+    &vertical_tracking_wheel,
+    nullptr,
+    &horizontal_tracking_wheel,
+    nullptr,
+    &imu
+);
 
-    // banshee subsystem
-    pros::Motor bansheespin (9, pros::MotorGearset::green);
-    pros::Motor bansheelift (1, pros::MotorGearset::green);
+// chassis
+lemlib::Chassis chassis(
+    drivetrain,
+    lateral_controller,
+    angular_controller,
+    sensors
+);
 
-    // cascade
-    pros::MotorGroup cascade({-18, 10}, pros::MotorGearset::green);
+// intake
+pros::Motor intake(2, pros::MotorGearset::green);
+
+// banshee subsystem
+pros::Motor bansheespin(9, pros::MotorGearset::green);
+pros::Motor bansheelift(1, pros::MotorGearset::green);
+
+// cascade
+pros::MotorGroup cascade({-18, 10}, pros::MotorGearset::green);

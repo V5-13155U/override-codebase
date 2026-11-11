@@ -1,106 +1,103 @@
+
 #include "main.h"
 #include <cmath>
 
+/**
+ * LCD center button callback.
+ */
+void on_center_button() {
+    static bool pressed = false;
+    pressed = !pressed;
 
-    /**
-    * A callback function for LLEMU's center button.
-    *
-    * When this callback is fired, it will toggle line 2 of the LCD text between
-    * "I was pressed!" and nothing.
-    */
-    
-    void on_center_button() {
-        static bool pressed = false;
-        pressed = !pressed;
-        if (pressed) {
-            pros::lcd::set_text(2, "I was pressed!");
-        } else {
-            pros::lcd::clear_line(2);
-        }
+    if (pressed) {
+        pros::lcd::set_text(2, "I was pressed!");
+    } else {
+        pros::lcd::clear_line(2);
     }
+}
 
-    /**
-    * Runs initialization code. This occurs as soon as the program is started.
-    *
-    * All other competition modes are blocked by initialize; it is recommended
-    * to keep execution time for this mode under a few seconds.
-    */
-    
-    void initialize() {
-        pros::lcd::initialize();
-        pros::lcd::register_btn1_cb(on_center_button);
+/**
+ * Initialization.
+ */
+void initialize() {
+    pros::lcd::initialize();
+    pros::lcd::register_btn1_cb(on_center_button);
 
-        pros::lcd::print(0, "initializing + calibrating");
-        vertical_encoder.reset();
-        vertical_encoder.set_reversed(true);
-        chassis.calibrate();
+    pros::lcd::print(0, "Initializing");
 
+    vertical_encoder.reset();
+    vertical_encoder.set_reversed(true);
 
+    chassis.calibrate();
+
+    pros::lcd::print(0, "Calibration complete");
+}
+
+/**
+ * Disabled.
+ */
+void disabled() {}
+
+/**
+ * Autonomous - Sensor diagnostic.
+ */
+void autonomous() {
+    left_motors.move(0);
+    right_motors.move(0);
+
+    while (true) {
+        double heading = imu.get_heading();
+
+        pros::lcd::print(0, "SENSOR DIAGNOSTICS");
+
+        pros::lcd::print(1, "IMU: %.2f", heading);
+
+        pros::lcd::print(
+            2, "Vertical: %d",
+            (int)vertical_encoder.get_position()
+        );
+
+        pros::lcd::print(
+            3, "Horizontal: %d",
+            (int)horizontal_encoder.get_position()
+        );
+
+        pros::delay(100);
     }
+}
 
-    /**
-    * Runs while the robot is in the disabled state of Field Management System or
-    * the VEX Competition Switch, following either autonomous or opcontrol. aWhen
-    * the robot is enabled, this task will exit.
-    */
-    
-    void disabled() {}
+/**
+ * Driver control.
+ */
+void opcontrol() {
+    pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
-    /**
-    * Runs after initialize(), and before autonomous when connected to the Field
-    * Management System or the VEX Competition Switch. This is intended for
-    * competition-specific initialization routines, such as an autonomous selector
-    * on the LCD.
-    *
-    * This task will exit when the robot is enabled and autonomous or opcontrol
-    * starts.
-    */
+    auto curve = [](int input) -> int {
+        const int deadband = 5;
+        const double expo = 0.45;
 
-    void autonomous() {
-        chassis.setPose(0, 0, 0);
+        if (std::abs(input) < deadband)
+            return 0;
 
-        chassis.moveToPoint(0, 24, 4000);
-        chassis.waitUntilDone();
+        double x = input / 127.0;
+
+        x = expo * x * x * x + (1.0 - expo) * x;
+
+        return static_cast<int>(x * 127.0);
+    };
+
+    while (true) {
+        int leftPower = curve(
+            controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y)
+        );
+
+        int rightPower = curve(
+            controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y)
+        );
+
+        left_motors.move(leftPower);
+        right_motors.move(rightPower);
+
+        pros::delay(10);
     }
-    
-    /** 
-    * Runs the operator control code. This function will be started in its own task
-    * with the default priority and stack size whenever the robot is enabled via
-    * the Field Management System or   the VEX Competition Switch in the operator
-    * control mode.
-    *
-    * If no competition control is connected, this function will run immediately
-    * following initialize().
-    *
-    * If the robot is disabled or communications is lost, the
-    * operator control task will be stopped. Re-enabling the robot will restart the
-    * task, not resume it from where it left off.
-    */
-
-   void opcontrol() {
-        pros::Controller controller(pros::E_CONTROLLER_MASTER);
-
-        auto curve = [](int input) -> int {
-            const int deadband = 5;
-            const double expo = 0.45;
-
-            if (std::abs(input) < deadband)
-                return 0;
-
-            double x = input / 127.0;
-
-            x = expo * x * x * x + (1.0 - expo) * x;
-
-            return static_cast<int>(x * 127.0);
-        };
-
-        while (true) {
-            int leftPower = curve(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y));
-            int rightPower = curve(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
-
-            left_motors.move(leftPower);
-            right_motors.move(rightPower);
-
-            pros::delay(10);
-        }
-    }
+}
