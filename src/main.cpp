@@ -93,11 +93,6 @@
     * starts.
     */
 
-
-    void autonomous() {
-        chassis.setPose(0, 0, 0);
-        chassis.moveToPoint(0,48,4000);
-        chassis.turnToHeading(90, 4000);
-    }
+    // Note: autonomous() is defined in src/robotcontrol/autonomous.cpp
 
     // Note: opcontrol() is defined in src/robotcontrol/opcontrol.cpp
