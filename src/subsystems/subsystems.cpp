@@ -12,7 +12,7 @@ lemlib::Drivetrain drivetrain(
     11,
     lemlib::Omniwheel::NEW_325,
     360,
-    2
+    3
 );
 
 // lateral PID controller
@@ -31,10 +31,10 @@ lemlib::ControllerSettings lateral_controller(
 // angular PID controller
 lemlib::ControllerSettings angular_controller(
     8, // kP
-    0,    // kI
+    0.1,    // kI
     40,    // kD
-    0,    // anti windup
-    2,    // small error range (degrees)
+    3,    // anti windup
+    1,    // small error range (degrees)
     100,  // small error range timeout (ms)
     5,    // large error range (degrees)
     300,  // large error range timeout (ms)
