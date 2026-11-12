@@ -4,5 +4,6 @@
     void autonomous() {
         chassis.setPose(0, 0, 0);
         chassis.moveToPoint(0,48,4000);
+        pros::delay(500);
         chassis.turnToHeading(90, 4000);
     }
