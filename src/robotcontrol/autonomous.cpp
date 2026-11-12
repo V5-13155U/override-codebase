@@ -4,7 +4,7 @@
 void autonomous() {
     chassis.setPose(0, 0, 0);
     
-    // Spin the intake forward a little bit right at the start
+    // quick-release mechanism
     intake.move(127);
     pros::delay(300); 
     intake.move(0);
