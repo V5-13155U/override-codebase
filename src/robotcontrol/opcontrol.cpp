@@ -54,8 +54,8 @@ void opcontrol() {
             pros::delay(1000);
 
             // Increased height clearance (change 2.0 to a higher number if it needs even more room)
-            cascade.move_absolute(2.0 * 360, 100);
-            cascade_hold_position = 2.0 * 360;
+            cascade.move_absolute(3 * 360, 100);
+            cascade_hold_position = 3 * 360;
             pros::delay(1000);
 
             bansheelift.move_absolute(-400, 100);
