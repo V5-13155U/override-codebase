@@ -22,7 +22,8 @@ void autonomous() {
     chassis.moveToPoint(0, -13.7, 1000, {.forwards = false});
     chassis.turnToHeading(90, 1000, {}, true); 
     bansheelift.move_absolute(625, 100);
-    chassis.moveToPoint(-26, -13.7, 2000, {.forwards = false});
+    cascade.move_absolute(0.25 * 360, 100);
+    chassis.moveToPoint(-14.5, -13.7, 2000, {.forwards = false});
     pros::delay(500);
     bansheespin.move(-100); 
     pros::delay(1000); 
