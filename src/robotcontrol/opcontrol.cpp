@@ -43,7 +43,7 @@ void opcontrol() {
             intake.move(0);
         }
 
-        // A Button Macro Sequence (Banshee out to 800, cascade down, 1.5 inches up, banshee down to -400, then spin in)
+        // A Button Macro Sequence (Banshee out to 800, cascade down, cascade higher to 2.0, banshee down to -400, then spin in)
         if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
             bansheelift.move_absolute(800, 100);
             banshee_hold_position = 800;
@@ -53,8 +53,9 @@ void opcontrol() {
             cascade_hold_position = 0;
             pros::delay(1000);
 
-            cascade.move_absolute(1.5 * 360, 100);
-            cascade_hold_position = 1.5 * 360;
+            // Increased height clearance (change 2.0 to a higher number if it needs even more room)
+            cascade.move_absolute(2.0 * 360, 100);
+            cascade_hold_position = 2.0 * 360;
             pros::delay(1000);
 
             bansheelift.move_absolute(-400, 100);
