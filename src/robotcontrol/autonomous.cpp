@@ -4,8 +4,12 @@ void autonomous() {
     chassis.setPose(0, 0, 0);
 
     // Spin the intake forward while driving reverse 5 inches
-    chassis.moveToPoint(0, -5, 1000, {.forwards = false, .minSpeed = 127});
+    chassis.moveToPoint(0, -5, 1000, {.forwards = false, .minSpeed = 127}, true);
+    pros::delay(750);
+    chassis.cancelMotion();
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
     pros::delay(500);
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
     chassis.moveToPoint(0, 1.5, 1000);
     chassis.moveToPoint(0, -5, 1000, {.forwards = false});
     chassis.moveToPoint(0, 1.5, 1000);
