@@ -3,19 +3,21 @@
 void autonomous() {
     chassis.setPose(0, 0, 0);
 
-    // Spin the intake forward while driving reverse 5 inches
+    // quickly stop drivetrain so quick-release mech falls down
     left_motors.move(-127);
     right_motors.move(-127);
     pros::delay(150);
     left_motors.brake();
     right_motors.brake();
-    //chassis.cancelMotion();
-    //chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
     pros::delay(500);
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
+
+    // switches toggle twice
     chassis.moveToPoint(0, 1.5, 1000);
     chassis.moveToPoint(0, -5, 1000, {.forwards = false});
     chassis.moveToPoint(0, 1.5, 1000);
+
+    // scoring preload
     chassis.moveToPoint(0, -14, 1000, {.forwards = false});
     chassis.turnToHeading(90, 1000, {}, true); bansheelift.move_absolute(600, 100);
     chassis.moveToPoint(-15, -14, 2000, {.forwards = false});
