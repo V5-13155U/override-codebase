@@ -43,26 +43,35 @@ void opcontrol() {
             intake.move(0);
         }
 
-        // A Button Macro Sequence (Banshee out to 800, cascade down, cascade higher to 2.0, banshee down to -400, then spin in)
+        // A Button Macro Sequence:
+        // 1. Banshee out to 800
+        // 2. Cascade all the way to max height (adjust 5.0 if your max height is higher/lower)
+        // 3. Cascade comes down to 2
+        // 4. Banshee goes all the way back in to -400
+        // 5. Start spinning in forever
         if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
+            // Step 1: Banshee out
             bansheelift.move_absolute(800, 100);
             banshee_hold_position = 800;
             pros::delay(800);
 
-            cascade.move_absolute(0, 100);
-            cascade_hold_position = 0;
+            // Step 2: Cascade all the way to max height
+            cascade.move_absolute(5.0 * 360, 100);
+            cascade_hold_position = 5.0 * 360;
+            pros::delay(1200);
+
+            // Step 3: Cascade comes down to 2
+            cascade.move_absolute(2.0 * 360, 100);
+            cascade_hold_position = 2.0 * 360;
             pros::delay(1000);
 
-            // Increased height clearance (change 2.0 to a higher number if it needs even more room)
-            cascade.move_absolute(1.9 * 360, 100);
-            cascade_hold_position = 1.9 * 360;
-            pros::delay(1000);
-
+            // Step 4: Banshee goes all the way back in
             bansheelift.move_absolute(-400, 100);
             banshee_hold_position = -400;
             pros::delay(800);
 
-            banshee_spin_mode = 1; // Start continuous spin-in
+            // Step 5: Start continuous spin-in
+            banshee_spin_mode = 1; 
         }
 
         // Cascade control with active position holding (L1 = up, L2 = down)
