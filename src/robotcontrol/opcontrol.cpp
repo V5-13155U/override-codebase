@@ -11,6 +11,9 @@ void opcontrol() {
     // Banshee spinner mode: 0 = stopped, 1 = spin in forever, -1 = spin out forever
     int banshee_spin_mode = 0;
 
+    // Drivetrain speed scale multiplier (1.0 = 100% full speed, 0.1 = 10% slow mode)
+    double drive_speed_multiplier = 1.0;
+
     // Joystick exponential curve function
     auto curve = [](int input) -> int {
         const int deadband = 5;
@@ -27,9 +30,17 @@ void opcontrol() {
 
     while (true) {
 
-        // Drivetrain control with exponential curves
-        int leftPower = curve(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y));
-        int rightPower = curve(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
+        // Drivetrain speed adjustment via Left and Right arrows
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+            drive_speed_multiplier = 1.0; // 100% max speed
+        } 
+        else if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
+            drive_speed_multiplier = 0.1; // 10% slow mode
+        }
+
+        // Drivetrain control with exponential curves and speed scaling applied
+        int leftPower = curve(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y)) * drive_speed_multiplier;
+        int rightPower = curve(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y)) * drive_speed_multiplier;
 
         left_motors.move(leftPower);
         right_motors.move(rightPower);
@@ -45,8 +56,8 @@ void opcontrol() {
 
         // A Button Macro Sequence:
         // 1. Banshee out to 800
-        // 2. Cascade all the way to max height (adjust 5.0 if your max height is higher/lower)
-        // 3. Cascade comes down to 2
+        // 2. Cascade all the way to max height (5.0 * 360)
+        // 3. Cascade comes down to 2.0 * 360
         // 4. Banshee goes all the way back in to -400
         // 5. Start spinning in forever
         if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
