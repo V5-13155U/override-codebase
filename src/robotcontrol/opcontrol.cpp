@@ -11,6 +11,9 @@ void opcontrol() {
     // Banshee spinner mode: 0 = stopped, 1 = spin in forever, -1 = spin out forever
     int banshee_spin_mode = 0;
 
+    // Drivetrain speed scale multiplier (1.0 = 100% full speed, 0.1 = 10% slow mode)
+    double drive_speed_multiplier = 1.0;
+
     // Joystick exponential curve function
     auto curve = [](int input) -> int {
         const int deadband = 5;
@@ -27,9 +30,17 @@ void opcontrol() {
 
     while (true) {
 
-        // Drivetrain control with exponential curves
-        int leftPower = curve(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y));
-        int rightPower = curve(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
+        // Drivetrain speed adjustment via Left and Right arrows
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+            drive_speed_multiplier = 1.0; // 100% max speed
+        } 
+        else if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
+            drive_speed_multiplier = 0.1; // 10% slow mode
+        }
+
+        // Drivetrain control with exponential curves and speed scaling applied
+        int leftPower = curve(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y)) * drive_speed_multiplier;
+        int rightPower = curve(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y)) * drive_speed_multiplier;
 
         left_motors.move(leftPower);
         right_motors.move(rightPower);
@@ -43,26 +54,35 @@ void opcontrol() {
             intake.move(0);
         }
 
-        // A Button Macro Sequence (Banshee out to 800, cascade down, cascade higher to 2.0, banshee down to -400, then spin in)
+        // A Button Macro Sequence:
+        // 1. Banshee out to 800
+        // 2. Cascade all the way to max height (5.0 * 360)
+        // 3. Cascade comes down to 2.0 * 360
+        // 4. Banshee goes all the way back in to -400
+        // 5. Start spinning in forever
         if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
+            // Step 1: Banshee out
             bansheelift.move_absolute(800, 100);
             banshee_hold_position = 800;
             pros::delay(800);
 
-            cascade.move_absolute(0, 100);
-            cascade_hold_position = 0;
+            // Step 2: Cascade all the way to max height
+            cascade.move_absolute(5.0 * 360, 100);
+            cascade_hold_position = 5.0 * 360;
+            pros::delay(1200);
+
+            // Step 3: Cascade comes down to 2
+            cascade.move_absolute(2.0 * 360, 100);
+            cascade_hold_position = 2.0 * 360;
             pros::delay(1000);
 
-            // Increased height clearance (change 2.0 to a higher number if it needs even more room)
-            cascade.move_absolute(1.9 * 360, 100);
-            cascade_hold_position = 1.9 * 360;
-            pros::delay(1000);
-
+            // Step 4: Banshee goes all the way back in
             bansheelift.move_absolute(-400, 100);
             banshee_hold_position = -400;
             pros::delay(800);
 
-            banshee_spin_mode = 1; // Start continuous spin-in
+            // Step 5: Start continuous spin-in
+            banshee_spin_mode = 1; 
         }
 
         // Cascade control with active position holding (L1 = up, L2 = down)
