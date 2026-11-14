@@ -45,37 +45,58 @@
         }
     });
 
-    /* bansheelift setup + intitialization
-    bansheelift.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
-    bansheelift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    bansheelift.move_velocity(60);
-    int stall_timer = 0;
-    int home_start = pros::millis();  // safety timeout so this can't loop forever
+        // BANSHEE LIFT HOMING
 
-    while ((std::abs(bansheelift.get_actual_velocity()) > 5 || stall_timer < 20) &&
-           pros::millis() - home_start < 3000) {
-        pros::delay(10);
-        if (std::abs(bansheelift.get_actual_velocity()) <= 5) {
-            stall_timer++;
-        } else {
-            stall_timer = 0;
+        bansheelift.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
+        bansheelift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+        // Reset any previous encoder reference
+        bansheelift.tare_position();
+
+        // Move toward the maximum raised position
+        bansheelift.move_velocity(60);
+
+        int stall_timer = 0;
+        int home_start = pros::millis();
+
+        while (pros::millis() - home_start < 5000) {
+
+            pros::delay(10);
+
+            if (std::abs(bansheelift.get_actual_velocity()) < 5) {
+                stall_timer++;
+            } else {
+                stall_timer = 0;
+            }
+
+            // Motor has remained stalled for 200ms
+            if (stall_timer >= 20) {
+                break;
+            }
         }
-    }
 
-    bansheelift.move_velocity(0);
-    bansheelift.tare_position(); 
+        // Stop the motor
+        bansheelift.move_velocity(0);
+        pros::delay(100);
 
-    // 3. Move down to your default starting position (Change -30 to whatever you want)
-    const int custom_start_angle = -30; 
-    bansheelift.move_absolute(custom_start_angle, 100);
+        // Establish fully raised position as 0 degrees
+        bansheelift.tare_position();
 
-    // wait for the lift to stop moving before calibrating the IMU,
-    // so vibration doesn't throw off the heading (max 1 second)
-    int settle_start = pros::millis();
-    while (std::fabs(bansheelift.get_position() - custom_start_angle) > 3 &&
-           pros::millis() - settle_start < 1000) {
-        pros::delay(10);
-    }*/
+        // Move to autonomous starting position
+        const double custom_start_angle = -30;
+
+        bansheelift.move_absolute(custom_start_angle, 100);
+
+        // Wait for the lift to reach its starting position
+        int settle_start = pros::millis();
+
+        while (std::fabs(bansheelift.get_position() - custom_start_angle) > 3 &&
+            pros::millis() - settle_start < 1500) {
+
+            pros::delay(10);
+        }
+
+        bansheelift.move(0);
 
     chassis.calibrate();
     cascade.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
