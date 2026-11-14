@@ -8,8 +8,8 @@ void opcontrol() {
     double banshee_hold_position = bansheelift.get_position();
     double cascade_hold_position = cascade.get_position();
 
-    // State flag for the continuous banshee spin-in loop
-    bool banshee_auto_spin = false;
+    // Banshee spinner mode: 0 = stopped, 1 = spin in forever, -1 = spin out forever
+    int banshee_spin_mode = 0;
 
     // Joystick exponential curve function
     auto curve = [](int input) -> int {
@@ -43,56 +43,67 @@ void opcontrol() {
             intake.move(0);
         }
 
-        // Right Arrow Macro Sequence (1.5 inches up, banshee at 800)
-        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
-            // Step 1: Move banshee lift to 800 (straight out)
+        // A Button Macro Sequence (1.5 inches up)
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
             bansheelift.move_absolute(800, 100);
             banshee_hold_position = 800;
             pros::delay(800);
 
-            // Step 2: Move cascade all the way down (0)
             cascade.move_absolute(0, 100);
             cascade_hold_position = 0;
             pros::delay(1000);
 
-            // Step 3: Move cascade up 1.5 inches (half of 3)
             cascade.move_absolute(1.5 * 360, 100);
             cascade_hold_position = 1.5 * 360;
             pros::delay(1000);
 
-            // Step 4: Keep banshee lift at 800 (straight out)
-            bansheelift.move_absolute(800, 100);
-            banshee_hold_position = 800;
+            bansheelift.move_absolute(-400, 100);
+            banshee_hold_position = -400;
             pros::delay(800);
 
-            // Step 5: Start the continuous spin-in loop
-            banshee_auto_spin = true;
+            banshee_spin_mode = 1; // Start continuous spin-in
         }
 
-        // Left Arrow Macro Sequence (3 inches up, banshee at 800)
-        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
-            // Step 1: Move banshee lift to 800 (straight out)
+        // Right Arrow Macro Sequence (3 inches up)
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
             bansheelift.move_absolute(800, 100);
             banshee_hold_position = 800;
             pros::delay(800);
 
-            // Step 2: Move cascade all the way down (0)
             cascade.move_absolute(0, 100);
             cascade_hold_position = 0;
             pros::delay(1000);
 
-            // Step 3: Move cascade up 3 inches (half of 6)
             cascade.move_absolute(3 * 360, 100);
             cascade_hold_position = 3 * 360;
             pros::delay(1000);
 
-            // Step 4: Keep banshee lift at 800 (straight out)
+            bansheelift.move_absolute(-400, 100);
+            banshee_hold_position = -400;
+            pros::delay(800);
+
+            banshee_spin_mode = 1; // Start continuous spin-in
+        }
+
+        // Left Arrow Macro Sequence (6 inches up)
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
             bansheelift.move_absolute(800, 100);
             banshee_hold_position = 800;
             pros::delay(800);
 
-            // Step 5: Start the continuous spin-in loop
-            banshee_auto_spin = true;
+            cascade.move_absolute(0, 100);
+            cascade_hold_position = 0;
+            pros::delay(1000);
+
+            cascade.move_absolute(6 * 360, 100);
+            cascade_hold_position = 6 * 360;
+            pros::delay(1000);
+
+            bansheelift.move_absolute(-400, 100);
+            banshee_hold_position = -400;
+            pros::delay(800);
+
+            banshee_spin_mode = 1; // Start continuous spin-in
         }
 
         // Cascade control with active position holding (L1 = up, L2 = down)
@@ -119,24 +130,23 @@ void opcontrol() {
             bansheelift.move_absolute(banshee_hold_position, 100);
         }
 
-        // Banshee spinner control (X, Y, or B break the auto-spin loop)
-        bool x_pressed = controller.get_digital(pros::E_CONTROLLER_DIGITAL_X);
-        bool y_pressed = controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y);
-        bool b_pressed = controller.get_digital(pros::E_CONTROLLER_DIGITAL_B);
-
-        if (x_pressed || y_pressed || b_pressed) {
-            banshee_auto_spin = false; // Interrupted by user button press
-
-            if (x_pressed) {
-                bansheespin.move(-127); // spin out
-            } else if (y_pressed) {
-                bansheespin.move(127);  // spin in
-            } else if (b_pressed) {
-                bansheespin.move(127);  // spin in
-            }
+        // Banshee spinner continuous control (X, Y, B start forever-spin modes)
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
+            banshee_spin_mode = -1; // Spin out forever until another button is pressed
         } 
-        else if (banshee_auto_spin) {
-            bansheespin.move(127);      // keeps spinning in forever until X, Y, or B is pressed
+        else if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
+            banshee_spin_mode = 1;  // Spin in forever until another button is pressed
+        } 
+        else if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
+            banshee_spin_mode = 1;  // Spin in forever until another button is pressed
+        }
+
+        // Apply spinner movement based on the active mode
+        if (banshee_spin_mode == 1) {
+            bansheespin.move(-127); // Spinning in forever
+        } 
+        else if (banshee_spin_mode == -1) {
+            bansheespin.move(127);  // Spinning out forever
         } 
         else {
             bansheespin.move(0);
