@@ -43,9 +43,9 @@ void opcontrol() {
             intake.move(0);
         }
 
-        // Right Arrow Macro Sequence (3 inches up)
+        // Right Arrow Macro Sequence (1.5 inches up, banshee at 800)
         if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
-            // Step 1: Move banshee lift to 800
+            // Step 1: Move banshee lift to 800 (straight out)
             bansheelift.move_absolute(800, 100);
             banshee_hold_position = 800;
             pros::delay(800);
@@ -55,23 +55,23 @@ void opcontrol() {
             cascade_hold_position = 0;
             pros::delay(1000);
 
-            // Step 3: Move cascade up 3 inches (3 * 360 degrees)
-            cascade.move_absolute(3 * 360, 100);
-            cascade_hold_position = 3 * 360;
+            // Step 3: Move cascade up 1.5 inches (half of 3)
+            cascade.move_absolute(1.5 * 360, 100);
+            cascade_hold_position = 1.5 * 360;
             pros::delay(1000);
 
-            // Step 4: Bring banshee lift all the way down to -400
-            bansheelift.move_absolute(-400, 100);
-            banshee_hold_position = -400;
+            // Step 4: Keep banshee lift at 800 (straight out)
+            bansheelift.move_absolute(800, 100);
+            banshee_hold_position = 800;
             pros::delay(800);
 
             // Step 5: Start the continuous spin-in loop
             banshee_auto_spin = true;
         }
 
-        // Left Arrow Macro Sequence (6 inches up)
+        // Left Arrow Macro Sequence (3 inches up, banshee at 800)
         if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
-            // Step 1: Move banshee lift to 800
+            // Step 1: Move banshee lift to 800 (straight out)
             bansheelift.move_absolute(800, 100);
             banshee_hold_position = 800;
             pros::delay(800);
@@ -81,14 +81,14 @@ void opcontrol() {
             cascade_hold_position = 0;
             pros::delay(1000);
 
-            // Step 3: Move cascade up 6 inches (6 * 360 degrees)
-            cascade.move_absolute(6 * 360, 100);
-            cascade_hold_position = 6 * 360;
+            // Step 3: Move cascade up 3 inches (half of 6)
+            cascade.move_absolute(3 * 360, 100);
+            cascade_hold_position = 3 * 360;
             pros::delay(1000);
 
-            // Step 4: Bring banshee lift all the way down to -400
-            bansheelift.move_absolute(-400, 100);
-            banshee_hold_position = -400;
+            // Step 4: Keep banshee lift at 800 (straight out)
+            bansheelift.move_absolute(800, 100);
+            banshee_hold_position = 800;
             pros::delay(800);
 
             // Step 5: Start the continuous spin-in loop
