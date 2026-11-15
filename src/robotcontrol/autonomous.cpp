@@ -9,18 +9,19 @@ void autonomous() {
     chassis.setPose(0, 0, 0);
 
     // quickly stop drivetrain so quick-release mech falls down
-    left_motors.move(-127);
-    right_motors.move(-127);
-    pros::delay(150);
-    left_motors.brake();
-    right_motors.brake();
-    pros::delay(500);
-    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
+    //left_motors.move(-127);
+    //right_motors.move(-127);
+    chassis.moveToPoint(0, -5, 1000, {.forwards = false, .minSpeed = 127});
+    //pros::delay(150);
+    //left_motors.brake();
+    //right_motors.brake();
+    //pros::delay(500);
+    //chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 
     // switches toggle twice
-    chassis.moveToPoint(0, 1.5, 1000, {.minSpeed = 127});
-    chassis.moveToPoint(0, -5, 1000, {.forwards = false, .minSpeed = 127});
-    chassis.moveToPoint(0, 1.5, 1000, {.minSpeed = 127});
+    chassis.moveToPoint(0, 1.5, 1000, {.minSpeed = 60});
+    chassis.moveToPoint(0, -5, 1000, {.forwards = false, .minSpeed = 60});
+    chassis.moveToPoint(0, 1.5, 1000, {.minSpeed = 60});
 
     // scoring preload
     chassis.moveToPoint(0, -13.7, 1000, {.forwards = false});
