@@ -18,9 +18,9 @@ void autonomous() {
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 
     // switches toggle twice
-    chassis.moveToPoint(0, 1.5, 1000);
-    chassis.moveToPoint(0, -5, 1000, {.forwards = false});
-    chassis.moveToPoint(0, 1.5, 1000);
+    chassis.moveToPoint(0, 1.5, 1000, {.minSpeed = 127});
+    chassis.moveToPoint(0, -5, 1000, {.forwards = false, .minSpeed = 127});
+    chassis.moveToPoint(0, 1.5, 1000, {.minSpeed = 127});
 
     // scoring preload
     chassis.moveToPoint(0, -13.7, 1000, {.forwards = false});
