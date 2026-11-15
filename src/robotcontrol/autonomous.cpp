@@ -15,7 +15,7 @@ void autonomous() {
     //chassis.moveToPoint(0, -5, 1000, {.forwards = false, .minSpeed = 127});
     pros::delay(500);
 
-\
+
     // switches toggle twice
     chassis.moveToPoint(0, 1, 100);
     chassis.moveToPoint(0, -5, 1000, {.forwards = false});
@@ -42,5 +42,6 @@ void autonomous() {
     
     // collecting preload
     chassis.moveToPoint(1, -13, 2000, {}, true);
-    chassis.turnToHeading(30, 1000);
+    chassis.turnToHeading(60, 1000);
+    //chassis.moveToPoint(-16, -10, 2000, {}, true);
 }
