@@ -11,8 +11,11 @@ void opcontrol() {
     // Banshee spinner mode: 0 = stopped, 1 = spin in forever, -1 = spin out forever
     int banshee_spin_mode = 0;
 
-    // Drivetrain speed scale multiplier (1.0 = 100% full speed, 0.1 = 10% slow mode)
-    double drive_speed_multiplier = 1.0;
+    // Drivetrain speed toggle state (false = 100% speed, true = 40% slow mode)
+    bool low_speed_mode = false;
+
+    // Cascade power multiplier (1.0 = 100% voltage/speed, 0.4 = 40%)
+    double cascade_multiplier = 1.0;
 
     // Joystick exponential curve function
     auto curve = [](int input) -> int {
@@ -30,13 +33,13 @@ void opcontrol() {
 
     while (true) {
 
-        // Drivetrain speed adjustment via Left and Right arrows
+        // Toggle drivetrain speed between 40% and 100% with each press of the Right Arrow
         if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
-            drive_speed_multiplier = 1.0; // 100% max speed
-        } 
-        else if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
-            drive_speed_multiplier = 0.1; // 10% slow mode
+            low_speed_mode = !low_speed_mode; // Flips between true and false
         }
+
+        // Apply multiplier based on the current toggle state
+        double drive_speed_multiplier = low_speed_mode ? 0.4 : 1.0;
 
         // Drivetrain control with exponential curves and speed scaling applied
         int leftPower = curve(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y)) * drive_speed_multiplier;
@@ -54,46 +57,31 @@ void opcontrol() {
             intake.move(0);
         }
 
-        // A Button Macro Sequence:
-        // 1. Banshee out to 800
-        // 2. Cascade all the way to max height (5.0 * 360)
-        // 3. Cascade comes down to 2.0 * 360
-        // 4. Banshee goes all the way back in to -400
-        // 5. Start spinning in forever
-        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
-            // Step 1: Banshee out
+        // Y Button: Move banshee claw out to 800, start spinning IN, and set cascade voltage to 40%
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
             bansheelift.move_absolute(800, 100);
             banshee_hold_position = 800;
-            pros::delay(800);
-
-            // Step 2: Cascade all the way to max height
-            cascade.move_absolute(5.0 * 360, 100);
-            cascade_hold_position = 5.0 * 360;
-            pros::delay(1200);
-
-            // Step 3: Cascade comes down to 2
-            cascade.move_absolute(2.0 * 360, 100);
-            cascade_hold_position = 2.0 * 360;
-            pros::delay(1000);
-
-            // Step 4: Banshee goes all the way back in
-            bansheelift.move_absolute(-400, 100);
-            banshee_hold_position = -400;
-            pros::delay(800);
-
-            // Step 5: Start continuous spin-in
-            banshee_spin_mode = 1; 
+            banshee_spin_mode = 1;     // Start spinning in forever
+            cascade_multiplier = 0.4;  // Set cascade voltage/power to 40%
         }
 
-        // Cascade control with active position holding (L1 = up, L2 = down)
+        // Left Arrow: Move banshee claw out to 950, start spinning IN, and set drivetrain to 40%
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
+            bansheelift.move_absolute(950, 100);
+            banshee_hold_position = 950; 
+            banshee_spin_mode = 1;      // Start spinning in forever
+            low_speed_mode = true;      // Set drivetrain speed to 40%
+        }
+
+        // Cascade control with active position holding (L1 = up, L2 = down) scaled by cascade_multiplier
         if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-            cascade.move(127);
+            cascade.move(127 * cascade_multiplier);
             cascade_hold_position = cascade.get_position();
         } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-            cascade.move(-127);
+            cascade.move(-127 * cascade_multiplier);
             cascade_hold_position = cascade.get_position();
         } else {
-            cascade.move_absolute(cascade_hold_position, 100);
+            cascade.move_absolute(cascade_hold_position, 100 * cascade_multiplier);
         }
 
         // Banshee lift control with active position holding (Up/Down arrows)
@@ -109,23 +97,25 @@ void opcontrol() {
             bansheelift.move_absolute(banshee_hold_position, 100);
         }
 
-        // Banshee spinner persistent controls (X = spin out, B = spin in, Y = stop)
+        // Banshee spinner persistent controls (X = spin in, B = spin out, A = stop + reset speeds to 100%)
         if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
-            banshee_spin_mode = -1; // Spin out forever
-        } 
-        else if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
             banshee_spin_mode = 1;  // Spin in forever
         } 
-        else if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
-            banshee_spin_mode = 0;  // Stop spinner
+        else if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
+            banshee_spin_mode = -1; // Spin out forever
+        } 
+        else if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
+            banshee_spin_mode = 0;   // Stop spinner
+            low_speed_mode = false;  // Reset drivetrain speed to 100%
+            cascade_multiplier = 1.0; // Reset cascade voltage to 100%
         }
 
-        // Apply spinner movement based on the active mode
+        // Apply spinner movement based on the active mode (127 = spin in, -127 = spin out)
         if (banshee_spin_mode == 1) {
-            bansheespin.move(-127); // Spinning in
+            bansheespin.move(127);  // Spinning in
         } 
         else if (banshee_spin_mode == -1) {
-            bansheespin.move(127);  // Spinning out
+            bansheespin.move(-127); // Spinning out
         } 
         else {
             bansheespin.move(0);    // Stopped
