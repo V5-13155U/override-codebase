@@ -10,12 +10,12 @@ void autonomous() {
     chassis.setPose(0, 0, 0);
 
     // quickly stop drivetrain so quick-release mech falls down
-    chassis.moveToPoint(0, -6, 1000, {.forwards = false, .minSpeed = 127});
-    chassis.moveToPoint(0, -5.5, 1000, {.minSpeed = 127});
+    chassis.moveToPoint(0, -7, 1000, {.forwards = false, .minSpeed = 127});
+    chassis.moveToPoint(0, -6, 1000, {.minSpeed = 127});
     //chassis.moveToPoint(0, -5, 1000, {.forwards = false, .minSpeed = 127});
     pros::delay(500);
 
-
+\
     // switches toggle twice
     chassis.moveToPoint(0, 1, 100);
     chassis.moveToPoint(0, -5, 1000, {.forwards = false});
@@ -27,21 +27,20 @@ void autonomous() {
     // scoring preload
     chassis.moveToPoint(0, -14.5, 1000, {.forwards = false});
     chassis.turnToHeading(90, 1000, {}, true); 
-    bansheelift.move_absolute(850, 100);
+    bansheelift.move_absolute(1.75 * 360, 100);
+    bansheelift.move_absolute(1.75 * 360, 100);
     cascade.move_absolute(0.5 * 360, 100);
     cascade_hold_position = 0.5 * 360;
     chassis.moveToPoint(-16, -13, 2000, {.forwards = false});
     pros::delay(1000);
-    bansheespin.move(-100); 
-    //pros::delay(1000); 
-    //bansheespin.move(0);
-    //cascade.move_absolute(4 * 360, 100);
-    //cascade_hold_position = 4 * 360;
-    //pros::delay (500);
+    bansheespin.move(-60); 
+    pros::delay(1000); 
+    bansheespin.move(0);
+    cascade.move_absolute(2 * 360, 100);
+    cascade_hold_position = 2 * 360;
+    pros::delay (500);
     
     // collecting preload
-    //cascade.move_absolute(8 * 360, 100);
-    //cascade_hold_position = 8 * 360;
-    //chassis.moveToPoint(9, -14.7, 2000, {}, true);
-    //chassis.turnToHeading(45, 1000);
+    chassis.moveToPoint(1, -13, 2000, {}, true);
+    chassis.turnToHeading(30, 1000);
 }
