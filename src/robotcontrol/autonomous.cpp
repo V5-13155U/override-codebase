@@ -27,10 +27,10 @@ void autonomous() {
     // scoring preload
     chassis.moveToPoint(0, -14.5, 1000, {.forwards = false});
     chassis.turnToHeading(90, 1000, {}, true); 
-    bansheelift.move_absolute(500, 100);
+    bansheelift.move_absolute(800, 100);
     cascade.move_absolute(0.5 * 360, 100);
-    //cascade_hold_position = 0.5 * 360;
-    //chassis.moveToPoint(-15, -12, 2000, {.forwards = false});
+    cascade_hold_position = 0.5 * 360;
+    chassis.moveToPoint(-16, -13, 2000, {.forwards = false});
     //pros::delay(500);
     //bansheespin.move(-100); 
     //pros::delay(1000); 
