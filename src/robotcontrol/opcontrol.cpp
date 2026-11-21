@@ -14,9 +14,6 @@ void opcontrol() {
     // Drivetrain speed toggle state (false = 100% speed, true = 40% slow mode)
     bool low_speed_mode = false;
 
-    // Cascade power multiplier (1.0 = 100% voltage/speed, 0.4 = 40%)
-    double cascade_multiplier = 1.0;
-
     // Joystick exponential curve function
     auto curve = [](int input) -> int {
         const int deadband = 5;
@@ -57,12 +54,11 @@ void opcontrol() {
             intake.move(0);
         }
 
-        // Y Button: Move banshee claw out to 800, start spinning IN, and set cascade voltage to 40%
+        // Y Button: Move banshee claw out to 800 AND start spinning IN forever
         if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
             bansheelift.move_absolute(800, 100);
             banshee_hold_position = 800;
-            banshee_spin_mode = 1;     // Start spinning in forever
-            cascade_multiplier = 0.4;  // Set cascade voltage/power to 40%
+            banshee_spin_mode = 1; // Start spinning in forever
         }
 
         // Left Arrow: Move banshee claw out to 950, start spinning IN, and set drivetrain to 40%
@@ -73,15 +69,15 @@ void opcontrol() {
             low_speed_mode = true;      // Set drivetrain speed to 40%
         }
 
-        // Cascade control with active position holding (L1 = up, L2 = down) scaled by cascade_multiplier
+        // Cascade control: Default is 100% speed going up (L1) and 40% speed going down (L2)
         if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-            cascade.move(127 * cascade_multiplier);
+            cascade.move(127); // 100% speed going up
             cascade_hold_position = cascade.get_position();
         } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-            cascade.move(-127 * cascade_multiplier);
+            cascade.move(-127 * 0.4); // 40% speed going down by default
             cascade_hold_position = cascade.get_position();
         } else {
-            cascade.move_absolute(cascade_hold_position, 100 * cascade_multiplier);
+            cascade.move_absolute(cascade_hold_position, 100);
         }
 
         // Banshee lift control with active position holding (Up/Down arrows)
@@ -97,7 +93,7 @@ void opcontrol() {
             bansheelift.move_absolute(banshee_hold_position, 100);
         }
 
-        // Banshee spinner persistent controls (X = spin in, B = spin out, A = stop + reset speeds to 100%)
+        // Banshee spinner persistent controls (X = spin in, B = spin out, A = stop + reset drivetrain speed to 100%)
         if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
             banshee_spin_mode = 1;  // Spin in forever
         } 
@@ -107,7 +103,6 @@ void opcontrol() {
         else if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
             banshee_spin_mode = 0;   // Stop spinner
             low_speed_mode = false;  // Reset drivetrain speed to 100%
-            cascade_multiplier = 1.0; // Reset cascade voltage to 100%
         }
 
         // Apply spinner movement based on the active mode (127 = spin in, -127 = spin out)
